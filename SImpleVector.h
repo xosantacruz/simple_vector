@@ -11,6 +11,7 @@ class SimpleVector {
    private:
       T *aptr;          // To point to the allocated array
       int arraySize;    // Number of elements in the array
+      int maxSize; // Max size of the array
       void memError();  // Handles memory allocation errors
       void subError();  // Handles subscripts out of range
 
@@ -19,22 +20,49 @@ class SimpleVector {
       SimpleVector() {
          aptr = 0;
          arraySize = 0;
+         maxSize = 50;
       }
 
       // Constructor declaration
       SimpleVector(int arraySize);
-      
+
+      // Constructor declaration with max size
+      SimpleVector(int arraySize, int maxSize);
+
       // Copy constructor declaration
       SimpleVector(const SimpleVector &);
       
       // Destructor declaration
-      ~SimpleVector(){
-        // delete[]
-      }
+      ~SimpleVector();
 
       // Accessor to return the array size
       int size() const {
          return arraySize;
+      }
+
+      //Augments the size of the vector by 1 to include the new value.
+      void push(int newValue) {
+         aptr = new T [++arraySize];
+
+         if (aptr == 0) {
+            memError();
+         }
+
+         aptr[arraySize - 1] = newValue;
+      }
+
+      // Doubles the size of the vector when max is reached
+      void pushWithMax(int newValue) {
+         if (arraySize == maxSize) {
+            arraySize *= 2;
+            aptr = new T [arraySize];
+
+            if (aptr == 0) {
+               memError();
+            }
+         }
+
+         aptr[arraySize - 1] = newValue;
       }
 
       // Accessor to return a specific element
@@ -64,6 +92,29 @@ SimpleVector<T>::SimpleVector(int s) {
    for (int count = 0; count < arraySize; count++) {
       *(aptr + count) = 0;
    }
+}
+
+//***********************************************************
+// Constructor for SimpleVector class. Sets the size of the *
+// array and max size andallocates memory for it.           *
+//***********************************************************
+
+template <class T>
+SimpleVector<T>::SimpleVector(int s, int m) {
+   arraySize = s;
+   // Allocate memory for the array.
+   try {
+      aptr = new T [s];
+   } catch (bad_alloc) {
+      memError();
+   }
+
+   // Initialize the array.
+   for (int count = 0; count < arraySize; count++) {
+      *(aptr + count) = 0;
+   }
+
+   maxSize = m;
 }
 
 //*******************************************
